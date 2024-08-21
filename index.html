@@ -295,9 +295,9 @@
             <option value="triangle">Triangle Synth</option>
             <option value="sawtooth">Sawtooth Synth</option>
 	</select>
-	<select id="key-naming" aria-labe="key naming">
-            <option value="sequence">Sequence</option>
-            <option value="simple-sequence">Simple Sequence</option>
+	<select id="keyNamingId" aria-labe="key naming">
+            <option value="sequence" selected>Sequence</option>
+            <option value="simpleSequence">Simple Sequence</option>
             <option value="name12edo">Name 12 edo</option>
             <option value="name24edo">Name 24 edo</option>
 	</select>
@@ -470,7 +470,7 @@
         }
 
         // Generate keyboard keys based on selected EDO and octaves
-        function generateKeyboard(edo, octaves) {
+        function generateKeyboard(edo, octaves, keyNaming='sequence') {
             const keyboard = document.getElementById('keyboard');
             keyboard.innerHTML = '';
             const config = edoConfigs[edo];
@@ -485,12 +485,18 @@
                 row1.className = 'key-row';
                 let row2 = document.createElement('div');
                 row2.className = 'key-row';
-
+                let keyName;
                 for (let i = 0; i < config.keys; i++) {
                     let key;
                     const freqIndex = i + (o * config.keys);
-                    key = createKey(`${i + 1 + (o * config.keys)}`, frequencies[freqIndex]);
-                    if(config.rows === 2 && i % 2 === 0) { row2.appendChild(key) ; }
+                    if (keyNaming === 'sequence'){
+                        keyName = `${i + 1 + (o * config.keys)}`;
+		    }
+		    else if (keyNaming === 'simpleSequence'){
+                       keyName = `${(i + (o * config.keys)) % edo + 1}`; 
+		    }
+                    key = createKey(keyName, frequencies[freqIndex]);
+                    if (config.rows === 2 && i % 2 === 0) { row2.appendChild(key) ; }
                     else { row1.appendChild(key) ; }
                 }
                 octaveContainer.appendChild(row1);
@@ -634,7 +640,7 @@
         document.getElementById('edo-select').addEventListener('change', () => {
             const edo = parseInt(document.getElementById('edo-select').value);
             const octaves = parseInt(document.getElementById('octave-select').value);
-            generateKeyboard(edo, octaves);
+            generateKeyboard(edo, octaves, keyNamingId.value);
         });
 
         document.getElementById('octave-select').addEventListener('change', () => {
